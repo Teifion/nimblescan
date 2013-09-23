@@ -1,7 +1,6 @@
-from .api import register, make_forwarder
-
 def includeme(config):
     from . import views
+    from . import api
     
     """
     Pass this to your configurator object like so:
@@ -20,6 +19,6 @@ def includeme(config):
     config.add_view(views.flush, route_name='nimblescan.flush', renderer='string', permission='loggedin')
     config.add_view(views.action, route_name='nimblescan.action', permission='loggedin')
     
-    register('nimblescan.flush', "Refresh scan menu", ['nimblescan'], (lambda r: True), make_forwarder("nimblescan.flush"))
+    api.register('nimblescan.flush', "Refresh scan menu", ['nimblescan'], (lambda r: True), api.make_forwarder("nimblescan.flush"))
     
     return config

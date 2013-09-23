@@ -1,12 +1,23 @@
-from datetime import datetime, timedelta, date
 from collections import namedtuple
 from .config import config
 from . import lib
 from pyramid.httpexceptions import HTTPFound
+from urllib.parse import urlencode
 
 def make_forwarder(path, **kwargs):
     def f(request):
         return HTTPFound(location=request.route_url(path, **kwargs))
+    return f
+
+def make_form_forwarder(path, params, **kwargs):
+    def  f(request):
+        data = {}
+        if params != []:
+            for p in params:
+                data[p] = request.params[p]
+        else:
+            data = dict(request.params)
+        return HTTPFound(location=request.route_url(path, **kwargs) + "?{}".format(urlencode(data, True)))
     return f
 
 def flush(user_id):
@@ -18,13 +29,13 @@ def flush(user_id):
     return lib.flush(user_id)
 
 NimblescanLink = namedtuple("NimblescanLink", ["name", "label", "search_terms", "qualifier", "handler", "form_data"])
-def register(name, label, search_terms, qualifier, handler, form_data={}, raise_on_dupe=False):
+def register(name, label, search_terms, qualifier, handler, form_data="", raise_on_dupe=False):
     """
     Examples:
-    register('wordy.menu', 'Wordy - Menu', ['games'], (lambda r: True), api.make_forwarder("wordy.menu"))
-    register('wordy.new_game', 'Wordy - New game', ['games'], (lambda r: True), api.make_forwarder("wordy.new_game"))
-    register('wordy.stats', 'Wordy - Stats', ['games'], (lambda r: True), api.make_forwarder("wordy.stats"))
-    register('wordy.preferences', 'Wordy - Preferences', ['games'], (lambda r: True), api.make_forwarder("wordy.preferences"))
+    api.register('wordy.menu', "Wordy - Menu", ['games'], (lambda r: True), api.make_forwarder("wordy.menu"))
+    api.register('wordy.new_game', "Wordy - New game", ['games'], (lambda r: True), api.make_form_forwarder("wordy.new_game", []), '<label for="ns_opponent">Opponent:</label> <input type="text" name="opponent_name1" id="ns_opponent" value="" style="display:inline-block;"/>')
+    api.register('wordy.stats', "Wordy - Stats", ['games'], (lambda r: True), api.make_forwarder("wordy.stats"))
+    api.register('wordy.preferences', "Wordy - Preferences", ['games'], (lambda r: True), api.make_forwarder("wordy.preferences"))
     """
     
     if name in config['handlers']:
@@ -60,12 +71,12 @@ def register(name, label, search_terms, qualifier, handler, form_data={}, raise_
         var ns_item_list = null;
         
         $(document).ready(function() {
-            $('body').after('<div id="nimblescan_dialog" style="display:none;" title="Search">\
+            $('body').after('<div id="nimblescan_dialog" style="display:none;" title="">\
                 <input type="text" id="nimblescan_text" value="" style="width:99%;"/>\
                 <div id="nimblescan_list" style="max-height:' + ($(window).height()-300) + 'px;">\
                     &nbsp;\
                 </div>\
-            </div><div id="nimblescan_cache" style="display:none;"></div>');
+            </div><div id="nimblescan_form" style="display:none;"></div><div id="nimblescan_cache" style="display:none;"></div>');
             
             $('#nimblescan_text').keyup(function(e) {
                 if (e.which != down_arrow && e.which != up_arrow && e.which != enter)
@@ -122,7 +133,7 @@ def register(name, label, search_terms, qualifier, handler, form_data={}, raise_
             });
             
             // When testing it can be useful to uncomment the following line
-            // show_nimblescan_modal();
+            show_nimblescan_modal();
         });
 
         // This function performs the actual filtering
@@ -185,7 +196,47 @@ def register(name, label, search_terms, qualifier, handler, form_data={}, raise_
         function select_goto (search_term)
         {
             var found_items = filter_gotos(search_term);
-            document.location = '${request.route_url('nimblescan.action')}?n=' + found_items[current_ns_selection][0];
+            var name = found_items[current_ns_selection][0];
+            var form = found_items[current_ns_selection][3];
+            url = '${request.route_url('nimblescan.action')}';
+            
+            if (form == "")
+            {
+                document.location = url + '?n=' + name;
+            }
+            else
+            {
+                show_form_dialog(url, name, form);
+            }
+            
+            /*
+            May want to use this with a more complex form, leaving it in for future reference
+            if (jQuery.isEmptyObject(form))
+            {
+                document.location = '${request.route_url('nimblescan.action')}?n=' + found_items[current_ns_selection][0];
+            }
+            else
+            {
+                alert("No handler");
+            }
+            */
+        }
+        
+        function show_form_dialog (url, name, form_contents)
+        {
+            var output = '<form action="' + url + '" method="post" accept-charset="utf-8">\
+                <input type="hidden" name="n" id="n" value="' + name + '" />\
+                ' + form_contents + '\
+                <input type="submit" id="nimblescan_submit" name="form.submitted" class="icbutton ui-button ui-widget ui-state-default ui-corner-all" value="Submit" style="margin: 0 auto;" role="button" aria-disabled="false">\
+            </form>';
+            
+            $('#nimblescan_form').html(output);
+            $('#nimblescan_form').dialog({
+                modal:true,
+                position:"top",
+                minWidth: 600,
+                closeOnEscape:true
+            });
         }
         
         function build_nimblescan_list (search_term, reset)
@@ -214,7 +265,7 @@ def register(name, label, search_terms, qualifier, handler, form_data={}, raise_
                 {
                     bg_colour = "#EEE";
                 }
-                output += "<a href='" + nimblescan_url + "/" + the_item[0] + "' style='display:block; text-decoration:none;background-color:" + bg_colour + ";margin:1px -3px 1px 0px;padding:2px;'>" + the_item[1] + "</a>";
+                output += "<a hhref='" + nimblescan_url + "?n=" + the_item[0] + "' style='display:block; text-decoration:none;background-color:" + bg_colour + ";margin:1px -3px 1px 0px;padding:2px;'>" + the_item[1] + "</a>";
             }
             
             return output;

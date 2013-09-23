@@ -35,7 +35,7 @@ def build(request):
     result = []
     for key in k_list:
         for h in options[key]:
-            result.append([h.name, h.label, h.search_terms])
+            result.append([h.name, h.label, h.search_terms, h.form_data])
     
     return json.dumps(result)
 
