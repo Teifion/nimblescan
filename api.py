@@ -133,7 +133,7 @@ def register(name, label, search_terms, qualifier, handler, form_data="", raise_
             });
             
             // When testing it can be useful to uncomment the following line
-            show_nimblescan_modal();
+            // show_nimblescan_modal();
         });
 
         // This function performs the actual filtering
