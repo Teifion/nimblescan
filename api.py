@@ -17,8 +17,8 @@ def flush(user_id):
     
     return lib.flush(user_id)
 
-NimblescanLink = namedtuple("NimblescanLink", ["name", "label", "search_terms", "qualifier", "handler"])
-def register(name, label, search_terms, qualifier, handler, raise_on_dupe=False):
+NimblescanLink = namedtuple("NimblescanLink", ["name", "label", "search_terms", "qualifier", "handler", "form_data"])
+def register(name, label, search_terms, qualifier, handler, form_data={}, raise_on_dupe=False):
     """
     Examples:
     register('wordy.menu', 'Wordy - Menu', ['games'], (lambda r: True), api.make_forwarder("wordy.menu"))
@@ -26,14 +26,14 @@ def register(name, label, search_terms, qualifier, handler, raise_on_dupe=False)
     register('wordy.stats', 'Wordy - Stats', ['games'], (lambda r: True), api.make_forwarder("wordy.stats"))
     register('wordy.preferences', 'Wordy - Preferences', ['games'], (lambda r: True), api.make_forwarder("wordy.preferences"))
     """
-   
+    
     if name in config['handlers']:
         if raise_on_dupe:
             raise KeyError("{} already exists".format(name))
         else:
             return False
-   
-    nc = NimblescanLink(name, label, search_terms + [label], qualifier, handler)
+    
+    nc = NimblescanLink(name, label, search_terms + [label], qualifier, handler, form_data)
     config['handlers'][name] = nc
     return True
 

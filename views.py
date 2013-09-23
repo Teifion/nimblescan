@@ -28,10 +28,12 @@ def flush(request):
     Wipe the cache for a given user
     """
     request.do_not_log = True
-    the_user = config['get_user_func'](request)
-    lib.flush(the_user.id)
+    user_id = config['get_user_func'](request).id
+    lib.flush(user_id)
     
-    return "Flushed"
+    if "fwd" in request.params:
+        return HTTPFound(location=request.params['fwd'])
+    return HTTPFound(location=request.route_url('/'))
 
 def action(request):
     request.do_not_log = True
