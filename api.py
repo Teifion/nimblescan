@@ -57,7 +57,7 @@ def register(name, label, search_terms, qualifier, handler, form_data="", raise_
         
         var ns_isCtrl = false;
         var ns_isShift = false;
-
+        
         // Now you get to pick which key it is
         var ns_f_key = 70;
         var ns_p_key = 80;
@@ -77,27 +77,27 @@ def register(name, label, search_terms, qualifier, handler, form_data="", raise_
                     &nbsp;\
                 </div>\
             </div><div id="nimblescan_form" style="display:none;"></div><div id="nimblescan_cache" style="display:none;"></div>');
-            
+           
             $('#nimblescan_text').keyup(function(e) {
-                if (e.which != down_arrow && e.which != up_arrow && e.which != enter)
+                if (e.which != ns_down_arrow && e.which != ns_up_arrow && e.which != ns_enter)
                 {
                     update_nimblescan_modal(true);
                 }
             });
             
             $('#nimblescan_text').keydown(function(e) {
-                if(e.which == enter) {
+                if(e.which == ns_enter) {
                     var search_term = $('#nimblescan_text').val().toLowerCase();
                     select_goto(search_term);
                     e.preventDefault();
                 }
-                else if(e.which == down_arrow)
+                else if(e.which == ns_down_arrow)
                 {
                     current_ns_selection += 1;
                     update_nimblescan_modal(false);
                     e.preventDefault();
                 }
-                else if(e.which == up_arrow)
+                else if(e.which == ns_up_arrow)
                 {
                     current_ns_selection -= 1;
                     if (current_ns_selection < 0)
@@ -108,7 +108,7 @@ def register(name, label, search_terms, qualifier, handler, form_data="", raise_
                     e.preventDefault();
                 }
             });
-
+            
             // This is where we check to see if we bring up the window
             $(document).keyup(function(e) {
                 if(e.which == 17) {
@@ -126,7 +126,7 @@ def register(name, label, search_terms, qualifier, handler, form_data="", raise_
                 if(e.which == 16) {
                     isShift = true;
                 }
-                if(e.which == hotkey && isCtrl && isShift) {
+                if(e.which == ns_hotkey && isCtrl && isShift) {
                     //alert(e.which);
                     show_nimblescan_modal();
                 }
@@ -135,7 +135,7 @@ def register(name, label, search_terms, qualifier, handler, form_data="", raise_
             // When testing it can be useful to uncomment the following line
             // show_nimblescan_modal();
         });
-
+ 
         // This function performs the actual filtering
         /*
         It expects the items in the form:
@@ -228,7 +228,7 @@ def register(name, label, search_terms, qualifier, handler, form_data="", raise_
                 <input type="hidden" name="n" id="n" value="' + name + '" />\
                 ' + form_contents + '\
                 <input type="submit" id="nimblescan_submit" name="form.submitted" class="icbutton ui-button ui-widget ui-state-default ui-corner-all" value="Submit" style="margin: 0 auto;" role="button" aria-disabled="false">\
-            </form>';
+            <' + '/form>';
             
             $('#nimblescan_form').html(output);
             $('#nimblescan_form').dialog({
@@ -256,7 +256,7 @@ def register(name, label, search_terms, qualifier, handler, form_data="", raise_
             for (var i = 0; i < found_items.length; i++)
             {
                 the_item = found_items[i];
-
+ 
                 if (i == current_ns_selection)
                 {
                     bg_colour = "#7AF";
