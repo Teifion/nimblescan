@@ -9,6 +9,11 @@ def make_forwarder(path, **kwargs):
         return HTTPFound(location=request.route_url(path, **kwargs))
     return f
 
+def make_raw_forwarder(path):
+    def f(request):
+        return HTTPFound(location=path)
+    return f
+
 def make_form_forwarder(path, params, **kwargs):
     def  f(request):
         data = {}
