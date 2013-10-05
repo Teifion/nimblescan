@@ -9,13 +9,18 @@ def make_forwarder(path, **kwargs):
         return HTTPFound(location=request.route_url(path, **kwargs))
     return f
 
+def make_get_forwarder(path, html_args="", **kwargs):
+    def f(request):
+        return HTTPFound(location=request.route_url(path, **kwargs) + "?%s" % html_args)
+    return f
+
 def make_raw_forwarder(path):
     def f(request):
         return HTTPFound(location=path)
     return f
 
 def make_form_forwarder(path, params, **kwargs):
-    def  f(request):
+    def f(request):
         data = {}
         if params != []:
             for p in params:
@@ -117,21 +122,21 @@ def register(name, label, search_terms, qualifier, handler, form_data="", raise_
             // This is where we check to see if we bring up the window
             $(document).keyup(function(e) {
                 if(e.which == 17) {
-                    isCtrl = false;
+                    ns_isCtrl = false;
                 }
                 if(e.which == 16) {
-                    isShift = false;
+                    ns_isShift = false;
                 }
             });
             // action on key down
             $(document).keydown(function(e) {
                 if(e.which == 17) {
-                    isCtrl = true;
+                    ns_isCtrl = true;
                 }
                 if(e.which == 16) {
-                    isShift = true;
+                    ns_isShift = true;
                 }
-                if(e.which == ns_hotkey && isCtrl && isShift) {
+                if(e.which == ns_hotkey && ns_isCtrl && ns_isShift) {
                     //alert(e.which);
                     show_nimblescan_modal();
                 }
