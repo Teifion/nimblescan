@@ -73,11 +73,15 @@ def register(name, label, search_terms, qualifier, handler, form_data="", raise_
         var ns_p_key = 80;
         var ns_l_key = 76;
         
+        var ns_asterix_key = 106;
+        var ns_apostraphe_key = 223;
+        vas ns_hash_key = 222;
+        
         var ns_down_arrow = 40;
         var ns_up_arrow = 38;
         var ns_enter = 13
         
-        var ns_hotkey = ns_l_key;
+        var ns_hotkey = ns_hash_key;
         var ns_item_list = null;
         
         $(document).ready(function() {
@@ -136,7 +140,8 @@ def register(name, label, search_terms, qualifier, handler, form_data="", raise_
                 if(e.which == 16) {
                     ns_isShift = true;
                 }
-                if(e.which == ns_hotkey && ns_isCtrl && ns_isShift) {
+                // if(e.which == ns_hotkey && ns_isCtrl && ns_isShift) {
+                if(e.which == ns_hotkey && ns_isCtrl) {
                     //alert(e.which);
                     show_nimblescan_modal();
                 }
